@@ -3,67 +3,37 @@ import { useState, useRef } from "react";
 import styles from "./Swipe.module.scss";
 
 export const Swipe = () => {
-  /* Swipe */
   const slider = useRef(null);
   const content = useRef(null);
 
-  // set up our state
-  let isDragging = false,
-    startPos = 0,
-    currentTranslate = 0,
-    prevTranslate = 0,
-    animationID,
-    currentIndex = 0;
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
-  const getPositionY = (event) => {
-    return event.touches[0].clientY;
+  // the required distance between touchStart and touchEnd to be detected as a swipe
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
+    setTouchStart(e.targetTouches[0].clientY);
   };
 
-  // use a HOF so we have index in a closure
-  const touchStart = (index) => {
-    return (event) => {
-      currentIndex = index;
-      startPos = getPositionY(event);
-      isDragging = true;
-      animationID = requestAnimationFrame(animation);
-    };
-  };
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientY);
 
-  const touchMove = (event) => {
-    if (isDragging) {
-      const currentPosition = getPositionY(event);
-      currentTranslate = prevTranslate + currentPosition - startPos;
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isUpSwipe = distance > minSwipeDistance;
+    const isDownSwipe = distance < -minSwipeDistance;
+
+    if (isUpSwipe) {
+      console.log("swipe up");
+      slider.current.style.transform = `translateY(-${content.current.clientHeight}px)`;
     }
-  };
 
-  const touchEnd = () => {
-    cancelAnimationFrame(animationID);
-    isDragging = false;
-    const movedBy = currentTranslate - prevTranslate;
-
-    if (movedBy < -100) currentIndex += 1;
-
-    if (movedBy > 100 && currentIndex > 0) currentIndex -= 1;
-
-    setPositionByIndex();
-  };
-
-  const animation = () => {
-    setSliderPosition();
-    if (isDragging) requestAnimationFrame(animation);
-  };
-
-  const setPositionByIndex = () => {
-    currentTranslate = currentIndex * -content.current.clientHeight;
-    prevTranslate = currentTranslate;
-    setSliderPosition();
-  };
-
-  const setSliderPosition = () => {
-    if (slider.current) {
-      slider.current.style.transform = `translateY(${currentTranslate}px)`;
+    if (isDownSwipe) {
+      console.log("swipe down");
+      slider.current.style.transform = `translateY(0px)`;
     }
-    /* slider.style.transform = `translateY(${currentTranslate}px)` */
   };
 
   return (
@@ -71,9 +41,9 @@ export const Swipe = () => {
       <div className={styles.sliderContainer} ref={slider}>
         <div
           className={styles.slide}
-          onTouchStart={touchStart(0)}
-          onTouchMove={touchMove}
-          onTouchEnd={touchEnd}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           <div className={styles.slideLine}></div>
         </div>
