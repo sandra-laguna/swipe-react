@@ -1,0 +1,56 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    
+  }
+
+  main{
+    background-color: #47A3CE;
+    height: 100vh;
+  }
+  
+  .sliderContainer {
+    overflow: hidden;
+    scrollbar-width: none;
+    transition: transform 0.3s ease-out;
+    position: fixed;
+    bottom: -200px; /* Altura contenido */
+    background-color: white;
+    border-radius: 20px 20px 0px 0px;
+    cursor: grab;
+  }
+  
+  .slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    max-height: 100vh;
+    width: 100vw;
+    align-items: center;
+    padding: 1rem;
+    height: 60px;
+  }
+
+  .slideLine{
+    width: 20%;
+    height: 3px;
+    border-radius: 8px;
+    background-color: rgba(0,0,0,0.3);
+  }
+
+  
+  .content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    padding: 0 1.5rem;
+  }
